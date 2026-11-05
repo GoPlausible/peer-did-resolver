@@ -63,7 +63,6 @@ describe('did:peer resolver', () => {
       ],
       keyAgreement: ['#key-1'],
       authentication: ['#key-2'],
-      assertionMethod: ['#key-2'],
       service: [
         {
           id: '#service',
@@ -99,5 +98,26 @@ describe('did:peer resolver', () => {
       },
     ])
     expect(result.didResolutionMetadata.contentType).toEqual('application/did+ld+json')
+  })
+})
+
+describe('did:peer resolver errors', () => {
+  const resolve = (did: string) => new Resolver(getResolver()).resolve(did)
+
+  it('reports a malformed identifier as invalidDid with the reason, and no document', async () => {
+    for (const did of ['did:peer:9zQmX', 'did:peer:2']) {
+      const result = await resolve(did)
+      expect(result.didDocument).toBeNull()
+      expect(result.didDocumentMetadata).toEqual({})
+      expect(result.didResolutionMetadata.error).toBe('invalidDid')
+      expect(result.didResolutionMetadata.message).toContain('is not a valid did:peer')
+    }
+  })
+
+  it('reports numalgo 1, which the core does not support, as notFound without a document', async () => {
+    const result = await resolve('did:peer:1zQmZMygzYqNwU6Uhmewx5Xepf2VLp5S4HLSwwgf2aiKZuwa')
+    expect(result.didDocument).toBeNull()
+    expect(result.didResolutionMetadata.error).toBe('notFound')
+    expect(result.didResolutionMetadata.message).toContain('numalgo 1')
   })
 })

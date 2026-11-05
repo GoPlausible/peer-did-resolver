@@ -11,8 +11,9 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "lib",
+    "rootDir": "src",
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "types": [
       "jest"
     ],
